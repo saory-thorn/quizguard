@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Use standalone output for Docker/self-hosted builds, but let Vercel use its standard build output.
-  output: process.env.VERCEL ? undefined : process.env.VERCEL ? undefined : "standalone",
+ output: process.env.VERCEL ? undefined : "standalone",
   // Removes the `X-Powered-By: Next.js` response header — no reason to advertise the stack.
   poweredByHeader: false,
   // Phase 13's Docker build (docs/ARCHITECTURE.md — Section 16) crashed on boot with
@@ -12,7 +12,11 @@ const nextConfig: NextConfig = {
   // gap (node_modules/next/dist/docs/.../output.md, "Caveats"). `@swc/helpers` was also added
   // as a direct dependency (package.json) so pnpm hoists it to a top-level, glob-resolvable
   // path — without that, this glob had nothing to match at all.
-  
+  outputFileTracingIncludes: process.env.VERCEL
+  ? undefined
+  : {
+      "/*": ["./node_modules/@swc/helpers/**/*"],
+    },
   async headers() {
     return [
       {
